@@ -1,8 +1,9 @@
 package functorial
 
-trait Raise[F[+_],E] extends Companion { module => 
+trait Raise[F[+_],E] extends Or[F] { module => 
   def raise(e: E): F[Nothing]
   def handle[A](a: F[A])(b: E => F[A]): F[A]
+  def or[A](a: F[A], b: => F[A]): F[A] = handle(a)(_ => b)
   implicit def syntax[A](m: F[A]): Raise.Syntax[F,E,A] = new Raise.Syntax[F,E,A] {
     val F = module
     def value = m
@@ -10,8 +11,8 @@ trait Raise[F[+_],E] extends Companion { module =>
 }
 
 object Raise {
-  trait Syntax[F[+_],E,+A] extends HasCompanion[Raise[F,E]] 
-                              with Wrapped[F[A]] { m => 
+  trait Syntax[F[+_],E,+A] extends Or.Syntax[F,A] 
+                              with HasCompanion[Raise[F,E]] { m => 
     def handling[B>:A](b: E => F[B]): F[B] = F.handle[B](value)(b)
   }
 }
