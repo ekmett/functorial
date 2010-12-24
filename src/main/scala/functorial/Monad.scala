@@ -8,7 +8,7 @@ trait Monad[F[+_]] extends Applicative[F] with Bind[F] { module =>
   def when(cond: Boolean, s: F[Unit]): F[Unit] = if (cond) s else unit
   def unless(cond: Boolean, s: F[Unit]): F[Unit] = if (cond) unit else s 
   override implicit def syntax[A](m: F[A]): Monad.Syntax[F,A] = new Monad.Syntax[F,A] {
-    val companion: Monad[F] = module
+    val F: Monad[F] = module
     def value: F[A] = m
   }
 }
@@ -20,7 +20,7 @@ object Monad {
   }
   object Transformer {
     trait Syntax[T[_[+_],+_],M[+_],+A] extends HasCompanion[Monad.Transformer[T]] {
-      val base: Monad[M]
+      val M: Monad[M]
     }
   }
 }

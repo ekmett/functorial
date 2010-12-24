@@ -9,7 +9,7 @@ sealed abstract class List[+A] extends MonadPlus.Syntax[List,A] { xs =>
   def tail: List[A]
   def isEmpty: Boolean
   def uncons: Option[(A,List[A])]
-  val companion: MonadPlus[List] = List
+  val F: MonadPlus[List] = List
   def ::[B>:A](x: B): List[B] = Cons(x, xs)
   def value = this
 }

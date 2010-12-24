@@ -6,6 +6,6 @@ trait Companion {
 }
 
 trait HasCompanion[+A <: Companion] {
-  implicit val companion: A
+  implicit val F: A
 }
 

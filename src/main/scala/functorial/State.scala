@@ -1,7 +1,7 @@
 package functorial
 
 class State[S,+A](f: S => (A,S)) extends Monad.Syntax[({type λ[+X] = State[S,X]})#λ, A] { m => 
-  val companion = new State.monad[S]
+  final val F = new State.monad[S]
   final def value = this
   final def apply(s: S): (A,S) = f(s)
   final override def flatMap[B](g: A => State[S,B]) = new State[S,B](s => { val (a,s1) = f(s); g(a)(s1) })
