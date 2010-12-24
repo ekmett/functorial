@@ -1,7 +1,7 @@
 package functorial
 
-trait EitherLowPriorityImplicits { 
-  sealed class monad[E] extends MonadOr[({type λ[+X] = Either[E,X]})#λ] {
+object Either {
+  class monadOr[E] extends MonadOr[({type λ[+X] = Either[E,X]})#λ] {
     def pure[A](a: A): Either[E,A] = Right(a)
     def bind[A,B](a: Either[E,A])(f: A => Either[E,B]): Either[E,B] = a match { 
       case left : Left[_,_] => left.asInstanceOf[Either[E,B]] 
@@ -12,13 +12,10 @@ trait EitherLowPriorityImplicits {
       case _ : Right[_,_] => x
     }
   }
-  def monad[E] = new monad[E]
-}
-
-object Either extends EitherLowPriorityImplicits { 
-  sealed class monadPlus[E](default: => E)
-       extends monad[E] with MonadPlus[({type λ[+X] = Either[E,X]})#λ] {
+  class monadPlus[E](default: => E)
+       extends monadOr[E] with MonadPlus[({type λ[+X] = Either[E,X]})#λ] {
     def empty = Left(default)
   }
+  def monad[E] = new monadOr[E]
   def monad[E](default: E) = new monadPlus[E](default)
 }
