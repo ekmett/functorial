@@ -13,9 +13,12 @@ trait Applicative[F[+_]] extends Pointed[F] { module =>
     val F = module
     def value = m
   }
-  implicit def static1[A,B](m: F[A => B]) = new Applicative.Static1[F,A,B](module,m)
-  implicit def static2[A,B,C](m: F[(A,B) => C]) = new Applicative.Static2[F,A,B,C](module,m)
-  implicit def static3[A,B,C,D](m: F[(A,B,C) => D]) = new Applicative.Static3[F,A,B,C,D](module,m)
+  implicit def static1[A,B](m: F[A => B]): Applicative.Static1[F,A,B]
+                                     = new Applicative.Static1[F,A,B](module,m)
+  implicit def static2[A,B,C](m: F[(A,B) => C]): Applicative.Static2[F,A,B,C]
+                                           = new Applicative.Static2[F,A,B,C](module,m)
+  implicit def static3[A,B,C,D](m: F[(A,B,C) => D]): Applicative.Static3[F,A,B,C,D]
+                                               = new Applicative.Static3[F,A,B,C,D](module,m)
 }
 
 object Applicative { 

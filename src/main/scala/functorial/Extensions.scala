@@ -1,3 +1,3 @@
 package functorial
 
-object Extensions extends RichFunctions
+object Extensions extends RichFunctions 
