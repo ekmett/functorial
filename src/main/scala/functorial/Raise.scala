@@ -4,7 +4,7 @@ trait Raise[F[+_],E] extends Or[F] { module =>
   def raise(e: E): F[Nothing]
   def handle[A](a: F[A])(b: E => F[A]): F[A]
   def or[A](a: F[A], b: => F[A]): F[A] = handle(a)(_ => b)
-  implicit def syntax[A](m: F[A]): Raise.Syntax[F,E,A] = new Raise.Syntax[F,E,A] {
+  override implicit def syntax[A](m: F[A]): Raise.Syntax[F,E,A] = new Raise.Syntax[F,E,A] {
     val F = module
     def value = m
   }

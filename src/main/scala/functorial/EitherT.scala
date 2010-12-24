@@ -1,9 +1,8 @@
 package functorial
 
 sealed class EitherT[M[+_],E,+A](val run: M[Either[E,A]])(implicit val M:Monad[M]) 
-     extends MonadOr.Syntax[({type λ[+X] = EitherT[M,E,X]})#λ, A]
+     extends MonadRaise.Syntax[({type λ[+X] = EitherT[M,E,X]})#λ,E,A]
         with Monad.Transformer.Syntax[({type λ[N[+_],+B] = EitherT[N,E,B]})#λ,M,A]
-        with Raise.Syntax[({type λ[+X] = EitherT[M,E,X]})#λ,E,A]
         with HasCompanion[EitherT.monadOr[M,E]] {
   import M._
   final def value = this
@@ -28,9 +27,8 @@ sealed class EitherT[M[+_],E,+A](val run: M[Either[E,A]])(implicit val M:Monad[M
         
 object EitherT {
   class monadOr[M[+_],E](val M:Monad[M])
-  extends MonadOr[({type λ[+X] = EitherT[M,E,X]})#λ]
-     with Monad.Transformer[({type λ[N[+_],+B] = EitherT[N,E,B]})#λ]
-     with Raise[({type λ[+X] = EitherT[M,E,X]})#λ,E] {
+  extends MonadRaise[({type λ[+X] = EitherT[M,E,X]})#λ, E]
+     with Monad.Transformer[({type λ[N[+_],+B] = EitherT[N,E,B]})#λ] {
     import M._
     def pure[A](a: A): EitherT[M,E,A] = new EitherT[M,E,A](M.pure(Right(a)))
     def bind[A,B](m: EitherT[M,E,A])(k: A => EitherT[M,E,B]): EitherT[M,E,B] = m flatMap k
