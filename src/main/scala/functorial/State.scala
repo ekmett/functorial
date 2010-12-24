@@ -1,25 +1,20 @@
 package functorial
 
-sealed class State[S,+A](f: S => (A,S)) extends Monad.Syntax[({type λ[+X] = State[S,X]})#λ, A] { m => 
+class State[S,+A](f: S => (A,S)) extends Monad.Syntax[({type λ[+X] = State[S,X]})#λ, A] { m => 
+  val companion = new State.monad[S]
+  final def value = this
   final def apply(s: S): (A,S) = f(s)
-  final override def flatMap[B](f: A => State[S,B]) = State[S,B](s => {
-    val as = m(s)
-    f(as._1)(as._2)
-  })
-  val companion = State.monad[S]
-  def value = this
+  final override def flatMap[B](g: A => State[S,B]) = new State[S,B](s => { val (a,s1) = f(s); g(a)(s1) })
+  final override def map[B](g: A => B) = new State[S,B](s => { val (a,s1) = f(s); (g(a),s1) })
 }
 
 object State {
   def apply[S,A](f: S => (A,S)) = new State(f)
-  def monad[S]: Monad[({type λ[+X] = State[S,X]})#λ] 
-           with FunctorState[({type λ[+X] = State[S,X]})#λ, S] = 
-            new Monad[({type λ[+X] = State[S,X]})#λ] 
-           with FunctorState[({type λ[+X] = State[S,X]})#λ, S] {
-    def pure[A](a: A): State[S,A] = State[S,A](s => (a, s))
-    def bind[A,B](f: A => State[S,B], m: State[S,A]): State[S,B] = m flatMap f 
-    override def get: State[S,S] = State[S,S](s => (s,s))
-    def state[A](f: S => (A,S)): State[S,A] = State[S,A](f)
+  class monad[S] extends Monad[({type λ[+X] = State[S,X]})#λ] 
+                    with PointedState[({type λ[+X] = State[S,X]})#λ, S] {
+    override def pure[A](a: A) = new State(s => (a,s))
+    override def apply[A,B](m: State[S,A])(f: A => B) = new State[S,B](s => { val (a,s1) = m(s); (f(a),s1) })
+    def bind[A,B](m: State[S,A])(f: A => State[S,B]) = new State[S,B](s => { val (a,s1) = m(s); f(a)(s1) })
+    def state[A](f: S => (A,S)): State[S,A] = new State[S,A](f)
   }
 }
-

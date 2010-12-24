@@ -17,7 +17,7 @@ sealed abstract class List[+A] extends MonadPlus.Syntax[List,A] { xs =>
 object List extends MonadPlus[List] { 
   // def filter[A]
   def pure[A](a: A): List[A] = Cons(a, Nil)
-  def bind[A,B](f: A => List[B], a: List[A]) = a flatMap f
+  def bind[A,B](a: List[A])(f: A => List[B]) = a flatMap f
   def empty = functorial.Nil
   def or[A](xs: List[A], ys: List[A]): List[A] = xs | ys
 }
@@ -33,7 +33,7 @@ case object Nil extends List[Nothing] {
   override def |[B](f: List[B]) = f
 }
 
-case class Cons[A](head: A, tail: List[A]) extends List[A] {
+case class Cons[+A](head: A, tail: List[A]) extends List[A] {
   def uncons: Option[(A,List[A])] = Some(head, tail)
   def isEmpty: Boolean = false
 
