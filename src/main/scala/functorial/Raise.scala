@@ -6,13 +6,13 @@ trait Raise[F[+_],E] extends Or[F] { module =>
   def or[A](a: F[A], b: => F[A]): F[A] = handle(a)(_ => b)
   override implicit def syntax[A](m: F[A]): Raise.Syntax[F,E,A] = new Raise.Syntax[F,E,A] {
     val F = module
-    def value = m
+    def self = m
   }
 }
 
 object Raise {
   trait Syntax[F[+_],E,+A] extends Or.Syntax[F,A] 
                               with HasCompanion[Raise[F,E]] { m => 
-    def handling[B>:A](b: E => F[B]): F[B] = F.handle[B](value)(b)
+    def handling[B>:A](b: E => F[B]): F[B] = F.handle[B](self)(b)
   }
 }

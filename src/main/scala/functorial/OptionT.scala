@@ -5,7 +5,7 @@ sealed class OptionT[M[+_],+A](val run: M[Option[A]])(implicit val M:Monad[M])
         with Monad.Transformer.Syntax[({type λ[N[+_],+B] = OptionT[N,B]})#λ,M,A]
         with HasCompanion[OptionT.monadPlus[M]] {
   import M._
-  final def value = this
+  final def self = this
   final val F : OptionT.monadPlus[M] = new OptionT.monadPlus[M](M)
   final override def flatMap[B](k: A => OptionT[M,B]): OptionT[M,B] = new OptionT[M,B](run flatMap { 
     case None    => M.pure(None)

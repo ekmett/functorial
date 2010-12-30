@@ -4,7 +4,7 @@ trait Pointed[F[+_]] extends Functor[F] with Pure[F] { module =>
   override implicit def syntax[A](m: F[A]): Pointed.Syntax[F,A] 
                                       = new Pointed.Syntax[F,A] {
     val F = module
-    def value = m
+    def self = m
   }
 }
 

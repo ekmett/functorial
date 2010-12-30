@@ -7,6 +7,8 @@ trait Empty[F[+_]] extends Companion { module =>
 }
 object Empty { 
   trait Syntax[F[+_],+A] extends HasCompanion[Empty[F]] 
-                           with Wrapped[F[A]]
+                           with Proxy { 
+    def self: F[A]
+  }
 }
 

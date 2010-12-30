@@ -6,7 +6,7 @@ trait Alternative[F[+_]] extends Empty[F]
                             with ApplicativeOr[F] { module => 
   override implicit def syntax[A](m: F[A]): Alternative.Syntax[F,A] = new Alternative.Syntax[F,A] {
     val F = module
-    def value = m
+    def self = m
   }
 }
 object Alternative {

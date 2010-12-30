@@ -5,7 +5,7 @@ sealed class EitherT[M[+_],E,+A](val run: M[Either[E,A]])(implicit val M:Monad[M
         with Monad.Transformer.Syntax[({type λ[N[+_],+B] = EitherT[N,E,B]})#λ,M,A]
         with HasCompanion[EitherT.monadOr[M,E]] {
   import M._
-  final def value = this
+  final def self = this
   final val F : EitherT.monadOr[M,E] = new EitherT.monadOr[M,E](M)
   final override def flatMap[B](k: A => EitherT[M,E,B]): EitherT[M,E,B] = new EitherT[M,E,B](run flatMap { 
     case l : Left[_,_] => M.pure(l.asInstanceOf[Either[E,B]])

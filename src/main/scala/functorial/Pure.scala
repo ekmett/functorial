@@ -6,12 +6,15 @@ trait Pure[F[+_]] extends Companion { module =>
   implicit def syntax[A](m: F[A]): Pure.Syntax[F,A] 
                              = new Pure.Syntax[F,A] {
     val F = module
-    def value = m
+    def self = m
   }
 }
 
 object Pure { 
   trait Syntax[F[+_],+A] extends HasCompanion[Pure[F]]
-                            with Wrapped[F[A]]
+                            with Proxy { 
+    def self: F[A]
+
+  }
 }
 

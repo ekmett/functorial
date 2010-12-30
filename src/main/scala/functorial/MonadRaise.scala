@@ -5,7 +5,7 @@ trait MonadRaise[F[+_],E] extends MonadOr[F]
   override implicit def syntax[A](m: F[A]): MonadRaise.Syntax[F,E,A]
                                       = new MonadRaise.Syntax[F,E,A] {
     val F = module
-    def value = m
+    def self = m
   }
 }
 

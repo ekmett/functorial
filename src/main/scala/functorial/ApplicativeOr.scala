@@ -11,7 +11,7 @@ trait ApplicativeOr[F[+_]] extends Applicative[F]
   override implicit def syntax[A](m: F[A]): ApplicativeOr.Syntax[F,A]
                                       = new ApplicativeOr.Syntax[F,A] {
     val F = module
-    def value = m
+    def self = m
   }
 }
 
@@ -20,8 +20,8 @@ object ApplicativeOr {
     extends Applicative.Syntax[F,A]
        with Or.Syntax[F,A]
        with HasCompanion[ApplicativeOr[F]] {
-    def * : F[List[A]] = F.many(value)
-    def + : F[List[A]] = F.some(value)
-    def ? : F[Option[A]] = F.optional(value)
+    def * : F[List[A]] = F.many(self)
+    def + : F[List[A]] = F.some(self)
+    def ? : F[Option[A]] = F.optional(self)
   }
 }

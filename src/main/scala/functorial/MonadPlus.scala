@@ -8,7 +8,7 @@ trait MonadPlus[F[+_]] extends Alternative[F] with MonadOr[F] with Filter[F] { m
   override implicit def syntax[A](m: F[A]): MonadPlus.Syntax[F,A]
                                       = new MonadPlus.Syntax[F,A] {
     val F = module
-    def value = m
+    def self = m
   }
 }
 

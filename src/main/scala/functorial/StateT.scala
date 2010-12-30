@@ -4,7 +4,7 @@ class StateT[M[+_],S,+A](f: S => M[(A,S)])(implicit val M:Monad[M])
   extends Monad.Syntax[({type λ[+X] = StateT[M,S,X]})#λ, A] 
      with Monad.Transformer.Syntax[({type λ[N[+_],+B] = StateT[N,S,B]})#λ,M,A] 
      with HasCompanion[StateT.monad[M,S]]{ m => 
-  final def value = this
+  final def self = this
   final def apply(s: S): M[(A,S)] = f(s)
   final val F = StateT.monad[M,S]
   final override def flatMap[B](k: A => StateT[M,S,B]) = new StateT[M,S,B](s => 

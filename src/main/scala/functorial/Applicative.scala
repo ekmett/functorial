@@ -11,7 +11,7 @@ trait Applicative[F[+_]] extends Pointed[F] { module =>
   def lift4[A,B,C,D,E](a: F[A],b: F[B],c: F[C],d: F[D])(f: (A,B,C,D) => E): F[E] = f !! a !* b !* c !* d
   override implicit def syntax[A](m: F[A]): Applicative.Syntax[F,A] = new Applicative.Syntax[F,A] {
     val F = module
-    def value = m
+    def self = m
   }
   implicit def static1[A,B](m: F[A => B]): Applicative.Static1[F,A,B]
                                      = new Applicative.Static1[F,A,B](module,m)
@@ -24,31 +24,31 @@ trait Applicative[F[+_]] extends Pointed[F] { module =>
 object Applicative { 
   trait Syntax[F[+_],+A] extends Pointed.Syntax[F,A] 
                             with HasCompanion[Applicative[F]] { m => 
-    def <**>[B](n: F[A => B]): F[B] = F.ap(m)(n)
-    def ~>[B](n: F[B]): F[B] = F.lift2(m,n)((_,b) => b)
-    def <~[B](n: F[B]): F[A] = F.lift2(m,n)((a,_) => a)
-    def ~[B](n: F[B]): F[(A,B)] = F.lift2(m,n)((a,b) => (a,b))
+    def <**>[B](n: F[A => B]): F[B] = F.ap(self)(n)
+    def ~>[B](n: F[B]): F[B] = F.lift2(self,n)((_,b) => b)
+    def <~[B](n: F[B]): F[A] = F.lift2(self,n)((a,_) => a)
+    def ~[B](n: F[B]): F[(A,B)] = F.lift2(self,n)((a,b) => (a,b))
     def forever: F[Nothing] = {
       lazy val loop : F[Nothing] = ~>(loop)
       loop
     }
     // def replicate(n: Int): F[List[A]]
   }
-  sealed class Static1[F[+_],-A,+B](val F:Applicative[F], val value: F[A => B]) 
+  sealed class Static1[F[+_],-A,+B](val F:Applicative[F], val self: F[A => B]) 
        extends Syntax[F,A => B] {
-    final def !!*(a: F[A]): F[B] = F.ap(a)(value)
-    final def !*(a: F[A]): F[B] = F.ap(a)(value)
+    final def !!*(a: F[A]): F[B] = F.ap(a)(self)
+    final def !*(a: F[A]): F[B] = F.ap(a)(self)
   }
-  sealed class Static2[F[+_],-A,-B,+C](val F:Applicative[F], val value: F[(A,B) => C]) 
+  sealed class Static2[F[+_],-A,-B,+C](val F:Applicative[F], val self: F[(A,B) => C]) 
        extends Syntax[F,(A,B) => C] {
     import F._
-    final def !!*(a: F[A],b: F[B]): F[C] = F(value)(_.curried) !* a !* b
-    final def !*(a: F[A]): F[B => C] = F(value)(_.curried) !* a
+    final def !!*(a: F[A],b: F[B]): F[C] = F(self)(_.curried) !* a !* b
+    final def !*(a: F[A]): F[B => C] = F(self)(_.curried) !* a
   }
-  sealed class Static3[F[+_],-A,-B,-C,+D](val F:Applicative[F], val value: F[(A,B,C) => D]) 
+  sealed class Static3[F[+_],-A,-B,-C,+D](val F:Applicative[F], val self: F[(A,B,C) => D]) 
        extends Syntax[F,(A,B,C) => D] {
     import F._
-    final def !!*(a: F[A],b: F[B], c: F[C]): F[D] = F(value)(f => f.curried) !* a !* b !* c
-    final def !*(a: F[A]): F[(B,C) => D] = F(value)(f => (a:A) => (b:B,c:C) => f(a,b,c)) !* a
+    final def !!*(a: F[A],b: F[B], c: F[C]): F[D] = F(self)(f => f.curried) !* a !* b !* c
+    final def !*(a: F[A]): F[(B,C) => D] = F(self)(f => (a:A) => (b:B,c:C) => f(a,b,c)) !* a
   }
 }
